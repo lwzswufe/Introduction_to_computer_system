@@ -1,0 +1,5 @@
+cd target_dir
+gcc target.c -o target_out
+//target.c 是代码  target是编译好的 可执行目标文件
+./ target_out   
+// 运行目标文件
