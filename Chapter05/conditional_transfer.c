@@ -4,14 +4,19 @@
 
 void minmax_1(int arr_a[], int arr_b[], int N)
 {   
-    int temp;
+    int temp_1, temp_2;
     for(int i = 0; i < N; i++)
-    {
+    {   
         if (arr_a[i] >= arr_b[i])
         {
-            temp = arr_a[i];
-            arr_a[i] = arr_b[i];
-            arr_b[i] = temp;
+            temp_1 = arr_a[i];
+            temp_2 = arr_b[i];
+            arr_a[i] = temp_1;
+            arr_b[i] = temp_2;
+
+            // temp_1 = arr_a[i];
+            // arr_a[i] = arr_b[i];
+            // arr_b[i] = temp_1;
         }
     }
 }
@@ -21,7 +26,7 @@ void minmax_2(int arr_a[], int arr_b[], int N)
 {   
     int min_ab, max_ab;
     for(int i = 0; i < N; i++)
-    {
+    {   
         min_ab = arr_a[i] <  arr_b[i] ? arr_a[i] : arr_b[i];
         max_ab = arr_a[i] >= arr_b[i] ? arr_b[i] : arr_a[i];
         arr_a[i] = min_ab;
