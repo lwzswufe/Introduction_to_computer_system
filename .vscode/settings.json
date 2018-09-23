@@ -59,6 +59,9 @@
         "iomanip": "cpp",
         "thread": "cpp",
         "mutex": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "winsock2.h": "c"
     }
 }
