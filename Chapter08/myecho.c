@@ -3,6 +3,7 @@
 int main(int argc, char* argv[], char* envp[])
 {
     int i = 0;
+    printf("Command line arguments num: %d\n", argc);
     printf("Command line arguments:\n");
     for(i=0; argv[i] != NULL; i++)
         printf("argv_%d: %s\n", i, argv[i]);
