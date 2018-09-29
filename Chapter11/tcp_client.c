@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
          error("ERROR reading from socket");
     printf("%s\n",buffer);
 
-    printf("Please enter the message: ");
     bzero(buffer,256);
     sprintf(buffer, "Hello I'm Client");
     n = write(sockfd,buffer,strlen(buffer));        // send data

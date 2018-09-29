@@ -1,84 +1,71 @@
+/* A simple server in the internet domain using TCP
+   The port number is passed as an argument */
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
+#include <unistd.h>
+#include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h> 
-
-/*
-struct  hostent
-{
-  char    *h_name;                  official name of host 
-  char    **h_aliases;              alias list 
-  int     h_addrtype;               host address type 
-  int     h_length;                 length of address 
-  char    **h_addr_list;            list of addresses from name server 
-  #define h_addr  h_addr_list[0]    address, for backward compatiblity 
-};
-void bcopy(char *s1, char *s2, int length)
-*/
+#include <arpa/inet.h> 
 
 void error(const char *msg)
 {
     perror(msg);
-    exit(0);
+    exit(1);
 }
 
 int main(int argc, char *argv[])
 {
-    int sockfd, portno, n;
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
-
-    int buffer_size = 256;
+    int sockfd, newsockfd, portno;
+    socklen_t clilen;
+    struct sockaddr_in serv_addr, cli_addr;
+    int n, buffer_size = 256;
     char buffer[buffer_size];
-    if (argc < 3)                               // default args
-    {   
-       // fprintf(stderr,"usage %s hostname port\n", argv[0]);
-       // exit(0);
-       portno = 8888;
-       server = gethostbyname("127.0.0.1");
+    uint32_t server_ip;
+    if (argc < 2)
+    {
+        // fprintf(stderr,"ERROR, no port provided\n");
+        // exit(1);
+        portno = 8888;
+        server_ip = inet_addr("127.0.0.1");
     }
     else
     {
         portno = atoi(argv[2]);
-        server = gethostbyname(argv[1]);
+        server_ip = inet_addr(argv[1]);
     }
-    printf("wait for connect....\r\n");
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);       // 获取文件描述符
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) 
         error("ERROR opening socket");
-    
-    if (server == NULL) 
-    {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
-    }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
 
-    bzero((char *) &serv_addr, sizeof(serv_addr));  //0初始化
     serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr_list[0], 
-          (char *)&serv_addr.sin_addr.s_addr,
-          server->h_length);
+    //serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_addr.s_addr = server_ip;
     serv_addr.sin_port = htons(portno);
-    printf("wait for connect....\r\n");
-    printf("server address:%s:%d \r\n", server->h_name, ntohs(serv_addr.sin_port));
+    
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+        error("ERROR on binding");
 
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-        sleep(100);                                 // wait for connect
+    printf("server address %s:%d \r\n", inet_ntoa(serv_addr.sin_addr), ntohs(serv_addr.sin_port));
 
-    printf("connect successful\n");
-    sprintf(buffer, "Hello I'm Server");
-    n = write(sockfd, buffer, strlen(buffer));      // send data
+    listen(sockfd,5);
+    clilen = sizeof(cli_addr);
+    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0) 
+         error("ERROR on accept");
+
+    n = write(newsockfd,"hello I'm Server", 18);
     if (n < 0) 
-         error("ERROR writing to socket");
+        error("ERROR writing to socket");
+
     bzero(buffer, buffer_size);
-    n = read(sockfd, buffer, buffer_size);          // recv data
+    n = read(newsockfd,buffer, buffer_size);
     if (n < 0) 
-         error("ERROR reading from socket");
-    printf("recv: %s\n",buffer);
+        error("ERROR reading from socket");
+        
+    close(newsockfd);
     close(sockfd);
-    return 0;
+    return 0; 
 }
