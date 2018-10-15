@@ -29,6 +29,14 @@ void sub_fun(short * sp, short size)
     sp = p;
 }
 
+short* get_arr(int N)                           // 显式分配内存创建数组 并返回指针
+{
+    short *p;
+    p = (short *)calloc(N, sizeof(short));
+    init_arr(p, N);
+    return p;
+}
+
 int main()
 {   
     short *p, *pp, *p0, *sp, n = 7;
@@ -49,4 +57,9 @@ int main()
     print_arr(sp, n);
     sub_fun(sp, n);
     print_arr(sp, n);
+
+    short *p_new;                               // 使用函数创建数组
+    p_new = get_arr(5);
+    print_arr(p_new, 5);
+    free(p_new);
 }
